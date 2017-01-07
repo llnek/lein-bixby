@@ -1,21 +1,41 @@
+;; Licensed under the Apache License, Version 2.0 (the "License");
+;; you may not use this file except in compliance with the License.
+;; You may obtain a copy of the License at
+;;
+;;     http://www.apache.org/licenses/LICENSE-2.0
+;;
+;; Unless required by applicable law or agreed to in writing, software
+;; distributed under the License is distributed on an "AS IS" BASIS,
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; See the License for the specific language governing permissions and
+;; limitations under the License.
+;;
+;; Copyright (c) 2017, Kenneth Leung. All rights reserved.
+
 (ns leiningen.new.wabbit
-  (:require [leiningen.new.templates :refer [renderer year date project-name
-                                             ->files sanitize-ns name-to-path
-                                             raw-resourcer multi-segment]]
+
+  (:import [java.rmi.server UID]
+           [java.util UUID])
+
+  (:require [leiningen.new.templates
+             :refer [renderer
+                     year
+                     date
+                     project-name
+                     ->files
+                     sanitize-ns
+                     name-to-path
+                     raw-resourcer
+                     multi-segment]]
             [clojure.string :as cs]
             [leiningen.core.main :as main]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 (def ^:private template-name "wabbit")
-
-(defn- render
-  ""
-  [path data]
-  (if (some #(.endsWith ^String path ^String %)
-            [".png" ".ico" ".jpg" ".gif"])
-    ((raw-resourcer template-name) path)
-    ((renderer template-name) path data)))
-
-(def ^:private tfiles
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(def ^:private template-files
   [{"conf" ["pod.conf"]}
    {"etc" ["log4j2c.xml" "log4j2d.xml" "shiro.ini"]}
    {"src/main"
@@ -30,63 +50,124 @@
      {"pages" ["index.html"]}
      {"scripts" ["main.js"]}
      {"styles" ["main.scss"]}]}
-   ".gitignore"
+   "gitignore"
    "CHANGELOG.md"
    {"doc" ["intro.md"]}
    "LICENSE"
    "project.clj"
    "README.md"
    {"public" nil}])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(def ^:private xref-files
+  {"gitignore" ".gitignore"})
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- isWindows?
+  "Is platform Windows?" []
+  (>= (.indexOf (cs/lower-case (System/getProperty "os.name")) "windows") 0))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 (defn- stripLS "" [s] (cs/replace s #"^[/]+" ""))
 
-(defn- yyy
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- juid
+  ""
+  []
+  (.replaceAll (str (UID.)) "[:\\-]+" ""))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- explodePath "" [s]
+  (->>
+    (cs/split s #"/")
+    (remove #(or (nil? %)
+                 (== 0 (.length %))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- sanitizePath "" [s]
+  (cs/join "/" (explodePath s)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- sanitizeTarget
+  ""
+  [des]
+  (let [tkns (explodePath des)
+        n (last tkns)
+        n (or (xref-files n) n)]
+    (cs/join
+      "/"
+      (conj (vec (drop-last tkns)) n))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- render
+  ""
+  [path data]
+  (let []
+    (if (some #(.endsWith ^String path ^String %)
+              [".png" ".ico" ".jpg" ".gif"])
+      ((raw-resourcer template-name) path)
+      ((renderer template-name) path data))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- traverse
   ""
   [par child data out]
   (cond
     (nil? child)
-    (swap! out conj (stripLS par))
+    (swap! out conj (sanitizePath par))
     (map? child)
     (doseq [[k v] child]
-      (yyy (str par "/" k) v data out))
+      (traverse (str par "/" k) v data out))
     (coll? child)
-    (doseq [c child] (yyy par c data out))
+    (doseq [c child] (traverse par c data out))
     (string? child)
     (let [s (str par "/" child)
-          s (stripLS s)
           s1 (cs/replace s "/_/" "/")
-          s2 (cs/replace s "/_/" "/{{nested-dirs}}/")
-          s1 (render s1 data)]
-      (swap! out conj [s2 s1]))))
+          s2 (cs/replace s "/_/" "/{{nested-dirs}}/")]
+      (swap! out conj [(sanitizeTarget s2)
+                       (render s1 data)]))))
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 (defn wabbit
   "FIXME: write documentation"
   [name]
-  (let [my-render (renderer "wabbit")
-        main-ns (sanitize-ns name)
-        data {:project (last (cs/split main-ns #"\."))
-              :nested-dirs (name-to-path main-ns)
-              :raw-name name
-              :domain main-ns
-              :app-key "111"
-              :ver "0.1.0"
-              :user "xxx"
-              :auth-plugin ""
-              :h2dbpath ""
-              :sample-emitter ""
-              :name name
-              :year (year)
-              :date (date)}
-        out (atom [])]
-    (main/info "Generating fresh 'lein new' wabbit project.")
-    (yyy "" tfiles data out)
-    (doseq [k @out
-            :when false]
-      (if (string? k)
-        (println "yyyy = " k)
-        (println "yyyy = " (first k))))
+  (let
+    [main-ns (sanitize-ns name)
+     pod (last (cs/split main-ns #"\."))
+     h2dbUrl (->
+               (cs/join "/"
+                        [(if (isWindows?)
+                           "/c:/temp" "/tmp")
+                         (juid)
+                         pod])
+               (str ";MVCC=TRUE;AUTO_RECONNECT=TRUE"))
+     data {:user (System/getProperty "user.name")
+           :nested-dirs (name-to-path main-ns)
+           :app-key (str (UUID/randomUUID))
+           :h2dbpath h2dbUrl
+           :domain main-ns
+           :raw-name name
+           :project pod
+           :ver "0.1.0"
+           :name name
+           :year (year)
+           :date (date)}
+     out (atom [])]
+    (main/info
+      (format "Generating fresh 'lein new' %s project." template-name))
+    (traverse "" template-files data out)
     (apply ->files data @out)))
-    ;;(println "map =\n" (str data))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;EOF
 
 
