@@ -133,12 +133,12 @@
           s1 (cs/replace s "/_/" "/")
           s2 (cs/replace s "/_/" "/{{nested-dirs}}/")]
       (swap! out conj [(sanitizeTarget s2)
-                       (render s1 data)]))))
+                       (render (stripLS s1) data)]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn wabbit
-  "FIXME: write documentation"
+  ""
   [name]
   (let
     [main-ns (sanitize-ns name)
