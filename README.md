@@ -1,2 +1,2 @@
 # lein-wabbit
-A lein template for creating a wabbit application
+A lein template for creating a czlab/wabbit application

@@ -5,11 +5,11 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
 
-  :license {:name "Apache License 2.0"
-            :url "http://www.apache.org/licenses/LICENSE-2.0"}
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [czlab/czlab-wabbit "0.1.0"]]
+                 [io.czlab/wabbit "0.1.0"]]
 
   :plugins [[lein-codox "0.10.2"]]
 
@@ -22,7 +22,7 @@
              :uberjar {:aot :all}}
 
   :global-vars {*warn-on-reflection* true}
-  :target-path "out/%s"
+  :target-path "target/%s"
   :aot :all
 
   :java-source-paths ["src/main/java" "test/main/java"]
