@@ -1,6 +1,6 @@
 (ns
 
-  test.test
+  {{domain}}.test.test
 
   (:use [clojure.test]))
 
@@ -12,5 +12,5 @@
 
 )
 
-;;(clojure.test/run-tests 'test.test.tcase1)
+;;(clojure.test/run-tests '{{domain}}.test.test.tcase1)
 

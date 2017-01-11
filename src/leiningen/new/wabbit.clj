@@ -34,12 +34,14 @@
   [{"conf" ["pod.conf"]}
    {"etc" ["log4j2c.xml" "log4j2d.xml" "shiro.ini"]}
    {"src/main"
-    [{"resources" ["mime.properties" "Resources_en.properties"]}
+    [{"resources"
+      [{"_" [{"etc" ["mime.properties"
+                     "Resources_en.properties"]}]}]}
      {"clojure" [{"_" ["core.clj"]}]}
      {"java" [{"_" ["HelloWorld.java"]}]}]}
    {"src/test"
-    [{"clojure/test" ["test.clj"]}
-     {"java/test" ["ClojureJUnit.java" "JUnit.java"]}]}
+    [{"clojure" [{"_" [{"test" ["test.clj"]}]}]}
+     {"java" [{"_" [{"test" ["ClojureJUnit.java" "JUnit.java"]}]}]}]}
    {"src/web"
     [{"media" ["favicon.png"]}
      {"pages" ["index.html"]}
@@ -134,7 +136,7 @@
 ;;
 (defn wabbit
   ""
-  [name]
+  [name & args]
   (let
     [main-ns (sanitize-ns name)
      pod (last (cs/split main-ns #"\."))

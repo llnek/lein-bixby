@@ -1,4 +1,4 @@
-package test;
+package {{domain}}.test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.JUnit4TestAdapter;

@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defproject wabbit/lein-template "0.1.0"
+(defproject wabbit/lein-template "0.1.1"
 
   :description "A leiningen template for creating a czlab/wabbit application"
 
