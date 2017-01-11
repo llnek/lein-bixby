@@ -31,33 +31,36 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (def ^:private template-files
-  [{"conf" ["pod.conf"]}
-   {"etc" ["log4j2c.xml" "log4j2d.xml" "shiro.ini"]}
-   {"src/main"
-    [{"resources"
-      [{"_" [{"etc" ["mime.properties"
-                     "Resources_en.properties"]}]}]}
-     {"clojure" [{"_" ["core.clj"]}]}
-     {"java" [{"_" ["HelloWorld.java"]}]}]}
-   {"src/test"
-    [{"clojure" [{"_" [{"test" ["test.clj"]}]}]}
-     {"java" [{"_" [{"test" ["ClojureJUnit.java" "JUnit.java"]}]}]}]}
-   {"src/web"
-    [{"media" ["favicon.png"]}
-     {"pages" ["index.html"]}
-     {"scripts" ["main.js"]}
-     {"styles" ["main.scss"]}]}
-   "gitignore"
-   "CHANGELOG.md"
-   {"doc" ["intro.md"]}
-   "LICENSE"
-   "project.clj"
-   "README.md"
-   {"public" nil}])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-(def ^:private xref-files
-  {"gitignore" ".gitignore"})
+  {"conf/pod.conf" "pod.conf"
+   "etc"
+   {"log4j2c.xml" identity
+    "log4j2d.xml" identity
+    "shiro.ini" identity}
+   "src/main/resources/{{nested-dirs}}/etc"
+   {"mime.properties" "etc/mime.properties"
+    "Resources_en.properties" "etc/Resources_en.properties"}
+   "src/main/clojure/{{nested-dirs}}"
+   {"core.clj" "src/core.clj"}
+   "src/main/java/{{nested-dirs}}"
+   {"HelloWorld.java" "src/HelloWorld.java"}
+   "src/test/clojure/{{nested-dirs}}/test"
+   {"test.clj" "src/test.clj"}
+   "src/test/java/{{nested-dirs}}/test"
+   {"ClojureJUnit.java" "src/ClojureJUnit.java"
+    "JUnit.java" "src/JUnit.java"}
+   "src/web/media"
+   {"favicon.png" "web/favicon.png"
+    "favicon.ico" "web/favicon.ico"}
+   "src/web/pages" {"index.html" "web/index.html"}
+   "src/web/scripts" {"main.js" "web/main.js"}
+   "src/web/styles" {"main.scss" "web/main.scss"}
+   ".gitignore" "gitignore"
+   "CHANGELOG.md" identity
+   "doc" {"intro.md" "intro.md"}
+   "LICENSE" identity
+   "project.clj" identity
+   "README.md" identity
+   "public" {}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -91,18 +94,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- sanitizeTarget
-  ""
-  [des]
-  (let [tkns (explodePath des)
-        n (last tkns)
-        n (or (xref-files n) n)]
-    (cs/join
-      "/"
-      (conj (vec (drop-last tkns)) n))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
 (defn- render
   ""
   [path data]
@@ -114,29 +105,38 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+(defn- doRender
+  ""
+  [tfiles data out]
+  (doseq [t tfiles]
+    (if (string? t)
+      (swap! out conj t)
+      (let [[k v] t]
+        (swap! out conj [k (render v data)])))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 (defn- traverse
   ""
-  [par child data out]
-  (cond
-    (nil? child)
-    (swap! out conj (sanitizePath par))
-    (map? child)
-    (doseq [[k v] child]
-      (traverse (str par "/" k) v data out))
-    (coll? child)
-    (doseq [c child] (traverse par c data out))
-    (string? child)
-    (let [s (str par "/" child)
-          s1 (cs/replace s "/_/" "/")
-          s2 (cs/replace s "/_/" "/{{nested-dirs}}/")]
-      (swap! out conj [(sanitizeTarget s2)
-                       (render (stripLS s1) data)]))))
+  [par tfiles out]
+  (doseq [[k v] tfiles
+          :let [kk (sanitizePath (str par "/" k))]]
+    (cond
+      (map? v)
+      (if (empty? v)
+        (swap! out conj kk)
+        (traverse kk v out))
+      (fn? v)
+      (swap! out conj [kk (v kk)])
+      (string? v)
+      (swap! out conj [kk v]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn wabbit
   ""
   [name & args]
+  ;;(println "args = " args)
   (let
     [main-ns (sanitize-ns name)
      pod (last (cs/split main-ns #"\."))
@@ -158,11 +158,13 @@
            :name name
            :year (year)
            :date (date)}
+     out2 (atom [])
      out (atom [])]
     (main/info
       (format "Generating fresh 'lein new' %s project." template-name))
-    (traverse "" template-files data out)
-    (apply ->files data @out)))
+    (traverse "" template-files out)
+    (doRender @out data out2)
+    (apply ->files data @out2)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF
