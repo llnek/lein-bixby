@@ -3,10 +3,10 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
-## 0.1.1 - 2017-01-10
+## 0.2.0 - 2017-01-10
 ### Changed
 - Accept arguments to the template creation to determine what sort
-  of application is to be built.
+  of io/services are to be enabled.
 - Changed the directory layout for test source files
 
 ## 0.1.0 - 2017-01-06
