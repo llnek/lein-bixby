@@ -8,7 +8,8 @@
 
 (ns leiningen.new.wabbit
 
-  (:import [java.rmi.server UID]
+  (:import [java.util.concurrent.atomic AtomicInteger]
+           [java.rmi.server UID]
            [java.util UUID])
 
   (:require [leiningen.new.templates
@@ -21,7 +22,9 @@
                      name-to-path
                      raw-resourcer
                      multi-segment]]
+            [clojure.pprint :as pp]
             [clojure.string :as cs]
+            [czlab.wabbit.svcs.core :as sc]
             [leiningen.core.main :as main]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -40,7 +43,7 @@
    {"mime.properties" "etc/mime.properties"
     "Resources_en.properties" "etc/Resources_en.properties"}
    "src/main/clojure/{{nested-dirs}}"
-   {"core.clj" "src/core.clj"}
+   {"core.clj" "src/soa.clj"}
    "src/main/java/{{nested-dirs}}"
    {"HelloWorld.java" "src/HelloWorld.java"}
    "src/test/clojure/{{nested-dirs}}/test"
@@ -131,15 +134,36 @@
       (string? v)
       (swap! out conj [kk v]))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn- checkSvcArgs
+  ""
+  [args]
+  (let [types (sc/emittersByType)
+        out (atom {})
+        cnt (AtomicInteger.)]
+    (doseq [a args
+            :let [a' (cs/replace a #"^[\-]+" "")
+                  k (keyword a')
+                  v (types k)]
+            :when (some? v)]
+      (let [n (str (name k) (.incrementAndGet cnt))
+            n' (keyword n)]
+        (swap! out assoc n' (:conf v))))
+    (let [s (with-out-str (pp/pprint @out))]
+      ;;(println s)
+      s)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn wabbit
-  ""
+  "A lein template for creating a czlab/wabbit application"
   [name & args]
-  ;;(println "args = " args)
   (let
-    [main-ns (sanitize-ns name)
+    [args (if (empty? args) ["-web"] args)
+     main-ns (sanitize-ns name)
      pod (last (cs/split main-ns #"\."))
+     svcstr (checkSvcArgs args)
      h2dbUrl (->
                (cs/join "/"
                         [(if (isWindows?)
@@ -150,6 +174,7 @@
      data {:user (System/getProperty "user.name")
            :nested-dirs (name-to-path main-ns)
            :app-key (str (UUID/randomUUID))
+           :io-services svcstr
            :h2dbpath h2dbUrl
            :domain main-ns
            :raw-name name
