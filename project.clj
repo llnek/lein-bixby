@@ -8,7 +8,6 @@
             :name "Eclipse Public License"}
   :url "https://github.com/llnek/lein-wabbit"
 
-  ;;{:deploy-repositories [["releases" :clojars]]}
   :dependencies [[io.czlab/wabbit-svcs "0.1.0"]]
   :target-path "out/%s"
   ;;cannot use aot!!!
