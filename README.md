@@ -3,7 +3,9 @@ A lein template for creating a czlab/wabbit application
 
 ## Usage
 
-lein new wabbit `app-name`
+lein new wabbit `app-name` [--to-dir <dir>] [-- <services>]
+e.g.
+lein new wabbit `a-1.b.c-2` -- files jms pop3
 
 ## License
 
