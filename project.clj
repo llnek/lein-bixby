@@ -9,7 +9,7 @@
             :name "Eclipse Public License"}
   :url "https://github.com/llnek/lein-wabbit"
 
-  :dependencies [[io.czlab/wabbit-common "0.1.0"]]
+  :dependencies [[io.czlab/wabbit-shared "0.1.0"]]
   :target-path "target/%s"
   ;;cannot use aot!!!
   ;;:aot :all

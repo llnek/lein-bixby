@@ -12,7 +12,7 @@
             [leiningen.new
              :refer [*use-snapshots?*
                      *template-version*]]
-            [czlab.wabbit.common.new :as wa]
+            [czlab.wabbit.shared.new :as wa]
             [clojure.java.io :as io]
             [stencil.core :as sc]
             [clojure.pprint :as pp]
