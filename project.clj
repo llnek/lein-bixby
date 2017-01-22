@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The group name is the template name, so in this case the template-name
 ;; is 'wabbit'
-(defproject wabbit/lein-template "0.2.0"
+(defproject wabbit/lein-template "1.0.0"
 
   :description "A leiningen template for creating a czlab/wabbit application"
 
@@ -9,7 +9,7 @@
             :name "Eclipse Public License"}
   :url "https://github.com/llnek/lein-wabbit"
 
-  :dependencies [[io.czlab/wabbit-shared "0.1.0"]]
+  :dependencies [[io.czlab/wabbit-shared "1.0.0"]]
   :target-path "target/%s"
   ;;cannot use aot!!!
   ;;:aot :all
