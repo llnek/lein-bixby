@@ -9,13 +9,14 @@
             :name "Eclipse Public License"}
   :url "https://github.com/llnek/lein-wabbit"
 
-  :dependencies [[io.czlab/wabbit-shared "1.0.0"]]
+  :dependencies [;;[leiningen-core "2.7.1"]
+                 ;;[leiningen "2.7.1"]
+                 [io.czlab/wabbit-shared "1.0.0"]]
   :target-path "target/%s"
-  ;;cannot use aot!!!
-  ;;:aot :all
+  ;;:aot [leiningen.wabbit]
 
-  :global-vars {*warn-on-reflection* true}
-  :eval-in-leiningen true)
+  :eval-in-leiningen true
+  :global-vars {*warn-on-reflection* true})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF

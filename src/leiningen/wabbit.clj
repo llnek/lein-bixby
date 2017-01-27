@@ -59,49 +59,73 @@
        deps (->> (cp/resolve-managed-dependencies
                    :dependencies
                    :managed-dependencies project)
-                 (filter #(.endsWith (.getName %) ".jar")))
+                 (filter #(.endsWith (.getName ^File %) ".jar")))
        jars (cons (io/file jar) deps)
        lib (io/file toDir "lib")]
       (.mkdirs lib)
       (doseq [fj jars
-              :let [n (.getName fj)
+              :let [n (.getName ^File fj)
                     t (io/file lib n)]]
         ;;(println "dep-jar = " t)
         (io/copy fj t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+(defn- sanitize
+  ""
+  ^String
+  [^String s data]
+  (reduce
+    #(let [[k v] %2]
+       (-> (cs/replace %1 (str "{{" k "}}") v)
+           (cs/replace (str "@@" k "@@") v)))
+    s
+    data))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 (defn- copyBin
   ""
-  [root]
+  [project root]
   (let [c2 (.getContextClassLoader (Thread/currentThread))
         c1 (.getClassLoader HelloWorld)
         bin (io/file root "bin")
         pfx "czlab/wabbit/shared/bin/"
-        arr ["log4j2.xml"
-             "wabbit"
-             "wabbit.bat"
-             "h2db-server"]]
+        arr {"log4j2.xml" false
+             "wabbit" true
+             "wabbit.bat" false
+             "h2db-server" false}
+        data {"kill-port" (:kill-port project)}
+        vmopts (cs/join " "
+                        (map #(sanitize % data)
+                             (:jvm-opts project)))
+        data (assoc data
+                    "vmopts" vmopts
+                    "agent" (:agentlib project))]
     (.mkdirs bin)
-    (doseq [r arr
+    (doseq [[r edit?] arr
             :let [res (str pfx r)
                   u (.getResource c2 res)]
             :when (some? u)]
       (with-open [inp (.openStream u)]
         (let [des (io/file bin r)]
-          (io/copy inp des)
+          (if (not edit?)
+            (io/copy inp des)
+            (->>
+              (-> (slurp inp)
+                  (sanitize data))
+              (spit des)))
           (.setExecutable des true))))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn- copyDir
   ""
-  [src des]
+  [^File src des]
 
   (let [p (.getCanonicalPath src)
         z (inc (.length p))]
-    (doseq [f (file-seq src)
+    (doseq [^File f (file-seq src)
             :let [cp (.getCanonicalPath f)
                   z' (.length cp)]
             :when (> z' z)]
@@ -117,7 +141,7 @@
 ;;
 (defn- packFiles
   ""
-  [project toDir]
+  [project ^File toDir]
 
   (let
     [dirs ["conf" "etc" "src" "doc" "public"]
@@ -127,7 +151,10 @@
     (doseq [d dirs
             :let [src (io/file root d)]]
       (copyDir src (io/file toDir d)))
-    (copyBin toDir)))
+    (copyBin project toDir)
+    (let [d (io/file toDir "logs")]
+      (.mkdirs d)
+      (spit (io/file d "readme.txt") "log files"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
