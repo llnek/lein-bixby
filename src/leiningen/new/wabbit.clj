@@ -22,8 +22,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn wabbit
+
   "A lein template for creating a czlab/wabbit application"
   [name & args]
+
   ;;(main/debug (str "args= " args))
   (try
     (main/info (format "Generating fresh 'lein new' %s project." wa/*template-name*))
@@ -32,7 +34,7 @@
        {:renderer-fn sc/render-string
         :dir (or *dir*
                  (-> (System/getProperty "leiningen.original.pwd")
-                     (io/file name) (.getPath)))
+                     (io/file name) .getPath))
         :force? *force?*
         :use-snapshots? *use-snapshots?*
         :template-version *template-version*}]
@@ -43,5 +45,4 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF
-
 

@@ -29,14 +29,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(def ^:private PKGDIR "pkg")
-
+(def ^:private pkg+dir "pkg")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- packLib
-  ""
-  [project toDir]
+(defn- packLib "" [project toDir]
+
   (let
     [scoped (set (pj/pom-scope-profiles project :provided))
      dft (set (pj/expand-profile project :default))
@@ -71,10 +69,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- sanitize
-  ""
-  ^String
-  [^String s data]
+(defn- sanitize "" ^String [s data]
+
   (reduce
     #(let [[k v] %2]
        (-> (cs/replace %1 (str "{{" k "}}") v)
@@ -84,9 +80,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- copyBin
-  ""
-  [project root]
+(defn- copyBin "" [project root]
+
   (let [c2 (.getContextClassLoader (Thread/currentThread))
         c1 (.getClassLoader HelloWorld)
         bin (io/file root "bin")
@@ -119,11 +114,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- copyDir
-  ""
-  [^File src des]
+(defn- copyDir "" [src des]
 
-  (let [p (.getCanonicalPath src)
+  (let [p (. ^File src getCanonicalPath)
         z (inc (.length p))]
     (doseq [^File f (file-seq src)
             :let [cp (.getCanonicalPath f)
@@ -140,8 +133,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn- packFiles
-  ""
-  [project ^File toDir]
+  "" [project ^File toDir]
 
   (let
     [dirs ["conf" "etc" "src" "doc" "public"]
@@ -159,31 +151,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 (defn wabbit
+
   "Podify wabbit to standalone application."
   [project & args]
+
   (let
     [dir (second (drop-while
                    #(not= "--to-dir" %) args))
      dir (or dir
-             (io/file (:root project) PKGDIR))
+             (io/file (:root project) pkg+dir))
      dir (io/file dir)]
     (packFiles project dir)
     (packLib project dir)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(defn hookJavac "" [task & args] (apply task args))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn hookJavac
-  ""
-  [task & args]
-  (apply task args))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-(defn activate
-  ""
-  []
-  (h/add-hook #'lj/javac #'hookJavac))
+(defn activate "" [] (h/add-hook #'lj/javac #'hookJavac))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF
