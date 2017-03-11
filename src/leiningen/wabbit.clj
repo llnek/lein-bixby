@@ -24,7 +24,7 @@
 
   (:use [czlab.wabbit.shared.core])
 
-  (:import [czlab.wabbit.shared HelloWorld]
+  (:import [czlab.wabbit.shared Bonjour]
            [java.io File]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,7 +83,7 @@
 (defn- copyBin "" [project root]
 
   (let [c2 (.getContextClassLoader (Thread/currentThread))
-        c1 (.getClassLoader HelloWorld)
+        c1 (.getClassLoader Bonjour)
         bin (io/file root "bin")
         pfx "czlab/wabbit/shared/bin/"
         arr {"log4j2.xml" false
