@@ -29,10 +29,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(def ^:private pkg+dir "pkg")
+(def ^:private pkg-dir "pkg")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
+;;largely from leiningen itself
 (defn- packLib "" [project toDir]
 
   (let
@@ -136,7 +136,8 @@
   "" [project ^File toDir]
 
   (let
-    [dirs ["conf" "etc" "src" "doc" "public"]
+    [dirs ["conf" "etc"
+           "src" "doc" "public"]
      root (:root project)]
     (.mkdir toDir)
     (cleanDir toDir)
@@ -159,7 +160,7 @@
     [dir (second (drop-while
                    #(not= "--to-dir" %) args))
      dir (or dir
-             (io/file (:root project) pkg+dir))
+             (io/file (:root project) pkg-dir))
      dir (io/file dir)]
     (packFiles project dir)
     (packLib project dir)))
