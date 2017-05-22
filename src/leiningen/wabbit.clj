@@ -20,9 +20,8 @@
             [clojure.java.io :as io]
             [clojure.string :as cs]
             [clojure.set :as set]
-            [robert.hooke :as h])
-
-  (:use [czlab.wabbit.shared.core])
+            [robert.hooke :as h]
+            [czlab.wabbit.shared.core :as ws])
 
   (:import [java.io File]))
 
@@ -68,14 +67,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-(defn- sanitize "" ^String [s data]
+(defn- sanitize "Interpolate the string" ^String [s data]
 
   (reduce
     #(let [[k v] %2]
        (-> (cs/replace %1 (str "{{" k "}}") v)
-           (cs/replace (str "@@" k "@@") v)))
-    s
-    data))
+           (cs/replace (str "@@" k "@@") v))) s data))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -114,7 +111,7 @@
 ;;
 (defn- copyDir "" [src des]
 
-  (let [p (. ^File src getCanonicalPath)
+  (let [p (.getCanonicalPath ^File src)
         z (inc (.length p))]
     (doseq [^File f (file-seq src)
             :let [cp (.getCanonicalPath f)
@@ -138,7 +135,7 @@
            "src" "doc" "public"]
      root (:root project)]
     (.mkdir toDir)
-    (cleanDir toDir)
+    (ws/cleanDir toDir)
     (doseq [d dirs
             :let [src (io/file root d)]]
       (copyDir src (io/file toDir d)))
@@ -162,14 +159,6 @@
      dir (io/file dir)]
     (packFiles project dir)
     (packLib project dir)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;(defn hookJavac "" [task & args] (apply task args))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;(defn activate "" [] (h/add-hook #'lj/javac #'hookJavac))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF
