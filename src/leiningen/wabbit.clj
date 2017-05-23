@@ -85,13 +85,13 @@
              "wabbit" true
              "wabbit.bat" false
              "h2db-server" false}
-        data {"kill-port" (:kill-port project)}
+        data {"kill-port" (str (:kill-port project))}
         vmopts (cs/join " "
                         (map #(sanitize % data)
                              (:jvm-opts project)))
         data (assoc data
                     "vmopts" vmopts
-                    "agent" (:agentlib project))]
+                    "agent" (str (:agentlib project)))]
     (.mkdirs bin)
     (doseq [[r edit?] arr
             :let [res (str pfx r)
