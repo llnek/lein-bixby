@@ -13,6 +13,7 @@ Add the following dependency to your `project.clj` file:
 
 * [API Docs](https://llnek.github.io/lein-wabbit/)
 
+
 ## Usage
 
 lein new wabbit `app-name` [--to-dir <dir>] [-- <services>]

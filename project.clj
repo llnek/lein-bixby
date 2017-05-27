@@ -12,6 +12,7 @@
   :dependencies [[io.czlab/wabbit-shared "1.0.0"]]
   :target-path "target/%s"
 
+
   :eval-in-leiningen true
   :global-vars {*warn-on-reflection* true})
 
