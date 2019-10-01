@@ -1,0 +1,153 @@
+#!/bin/bash
+##############################################################################
+### osx sux, has no proper readlink.
+check_darwin() {
+  WABBIT_BIN=$( perl -e 'use Cwd "abs_path";print abs_path(shift)' $0 )
+  WABBIT_BIN=$( dirname $WABBIT_BIN )
+  WABBIT_HOME=$( dirname $WABBIT_BIN )
+}
+
+check_linux() {
+  WABBIT_BIN=$(dirname $(readlink -f $0))/../
+  WABBIT_HOME=$(readlink -f $WABBIT_BIN)
+  WABBIT_BIN=$WABBIT_HOME/bin
+}
+
+##############################################################################
+OSTYPE=`uname -s`
+CWD=`pwd`
+if [ "$OSTYPE" = "Darwin" ]; then
+  check_darwin
+else
+  check_linux
+fi
+
+#############################################################################
+cd $WABBIT_HOME
+CWD=`pwd`
+#echo "Running wabbit from $CWD"
+
+##############################################################################
+if [ "$JAVA_HOME" = "" ] ; then
+  echo "Attempt to reference standard java location on system: /usr/bin."
+  #echo "Please set JAVA_HOME"
+  #exit -1
+  JAVA_HOME=/usr
+fi
+
+##############################################################################
+CONSCZ=czlab.wabbit.cons.con7
+MAINCZ=czlab.wabbit.exec
+JCMD=$JAVA_HOME/bin/java
+LIBS=$WABBIT_HOME/lib/*
+
+##############################################################################
+if [ ! -e "logs" ]; then
+  mkdir "logs"
+fi
+
+if [ ! -d "logs" ]; then
+  echo "error: directory [logs] is not found."
+fi
+
+##############################################################################
+run_console() {
+  local opts=$@
+  exec sh -c \
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ -domus \"$WABBIT_HOME\" $opts"
+}
+
+##############################################################################
+get_procid() {
+  pid=$( ps -ef | grep -F $MAINCZ | grep -v grep | awk '{print $2}' )
+}
+
+##############################################################################
+show_proc() {
+  get_procid
+  if [ -n "$pid" ]; then
+    echo "wabbit is running with process-id: ${pid}."
+  else
+    echo "wabbit is not running."
+  fi
+}
+
+##############################################################################
+stop_proc() {
+  get_procid
+  if [ -n "$pid" ]; then
+    echo "wabbit is stopping with process-id: ${pid}."
+    #kill $pid
+    cd /tmp
+    wget http://{{kill-port}}/kill9 > /dev/null 2>&1
+    cd $CWD
+  fi
+}
+
+##############################################################################
+run_proc() {
+  get_procid
+  if [ -n "$pid" ]
+  then
+    echo "wabbit is already running with process-id: ${pid}."
+  elif [ "$2" = "-b" -o "$2" = "--background" ]
+  then
+    run_proc_bg
+  else
+    run_proc_fg
+  fi
+}
+
+##############################################################################
+run_proc_bg() {
+  exec sh -c \
+    "exec nohup $JCMD {{vmopts}} \
+    -cp \"$LIBS\" $MAINCZ -domus \"$WABBIT_HOME\" $@ > /dev/null 2>&1 &"
+}
+
+##############################################################################
+run_proc_fg() {
+  exec sh -c \
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ -domus \"$WABBIT_HOME\" $@"
+}
+
+##############################################################################
+debug_proc_fg() {
+  exec sh -c \
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$WABBIT_HOME\" $@"
+}
+
+##############################################################################
+debug_proc_bg() {
+  exec sh -c \
+    "exec nohup $JCMD {{vmopts}} \
+    -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$WABBIT_HOME\" $@ > /dev/null 2>&1 &"
+}
+
+##############################################################################
+debug_proc() {
+  get_procid
+  if [ -n "$pid" ]
+  then
+    echo "wabbit is already running with process-id: ${pid}."
+  elif [ "$2" = "-b" -o "$2" = "--background" ]
+  then
+    debug_proc_bg
+  else
+    debug_proc_fg
+  fi
+}
+
+##############################################################################
+case $1 in
+  start | run ) run_proc $@ ;;
+  debug ) debug_proc $@ ;;
+  status ) show_proc $@ ;;
+  stop ) stop_proc $@ ;;
+  *) run_console $@ ;;
+esac
+
+
+##############################################################################
+#EOF 
+
