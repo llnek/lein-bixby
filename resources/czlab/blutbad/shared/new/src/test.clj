@@ -8,7 +8,7 @@
 ;;
 (deftest tcase1
 
-  (is (= 1 1))
+  (is (== 1 1))
 
   (is (string? "That's all folks!")))
 

@@ -8,15 +8,14 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies
-  [[org.clojure/clojurescript "1.10.520"]
+  [[org.clojure/clojurescript "1.10.597"]
    [org.clojure/clojure "1.10.1"]
    [commons-logging "1.2"]
-   [io.czlab/wabbit "1.1.0"]]
+   [io.czlab/blutbad "1.1.0"]]
 
-  :plugins [[wabbit/lein-template "1.1.0"]
-            [cider/cider-nrepl "0.22.2"]
-            [lein-codox "0.10.7"]
-            [lein-cprint "1.3.1"]]
+  :plugins [[blutbad/lein-template "1.1.0"]
+            [cider/cider-nrepl "0.22.4"]
+            [lein-codox "0.10.7"]]
 
   :kill-port "localhost:4444"
   :profiles
@@ -27,7 +26,7 @@
      "-XX:+UseConcMarkSweepGC"
      "-Xms1g"
      "-Xmx8g"
-     "-Dwabbit.kill.port=@@kill-port@@"
+     "-Dblutbad.kill.port=@@kill-port@@"
      "-Dlog4j.configurationFile=file:etc/log4j2d.xml"]}
    :uberjar {:aot :all}}
 
@@ -35,9 +34,9 @@
   :target-path "target/%s"
   :aot :all
 
-  :aliases {"wabbit-deploy" ["with-profile" "podify" "wabbit"]
-            "wabbit-run" ["trampoline" "run" "-m" "czlab.wabbit.exec"]
-            "wabbit-console" ["trampoline" "run" "-m" "czlab.wabbit.cons.con7"]}
+  :aliases {"blutbad-deploy" ["with-profile" "podify" "blutbad"]
+            "blutbad-run" ["trampoline" "run" "-m" "czlab.blutbad.exec"]
+            "blutbad-console" ["trampoline" "run" "-m" "czlab.blutbad.cons.con7"]}
 
   :java-source-paths ["src/main/java" "src/test/java"]
   :source-paths ["src/main/clojure"]

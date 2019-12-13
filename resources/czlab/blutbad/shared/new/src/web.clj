@@ -6,11 +6,11 @@
 
   {{domain}}.core
 
-  (:require [czlab.wabbit.xpis :as xp]
+  (:require [czlab.blutbad.xpis :as xp]
             [czlab.niou.core :as cc]
             [czlab.basal.core :as c]
             [czlab.basal.xpis :as po]
-            [czlab.wabbit.plugs.mvc :as mvc])
+            [czlab.blutbad.plugs.mvc :as mvc])
 
   (:import [java.io File]))
 
@@ -19,15 +19,15 @@
   []
   {:landing
              {:title_line "Sample Web App"
-              :title_2 "Demo wabbit"
+              :title_2 "Demo blutbad"
               :tagline "Say something" }
    :about
-             {:title "About wabbit demo" }
+             {:title "About blutbad demo" }
    :services {}
    :contact {:email "a@b.com"}
-   :description "wabbit web app"
+   :description "blutbad web app"
    :encoding "utf-8"
-   :title "wabbit|Sample"})
+   :title "blutbad|Sample"})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn dft-handler

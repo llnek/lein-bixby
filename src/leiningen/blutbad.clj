@@ -1,4 +1,4 @@
-;; Copyright (c) 2013-2017, Kenneth Leung. All rights reserved.
+;; Copyright (c) 2013-2019, Kenneth Leung. All rights reserved.
 ;; The use and distribution terms for this software are covered by the
 ;; Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
 ;; which can be found in the file epl-v10.html at the root of this distribution.
@@ -6,24 +6,19 @@
 ;; the terms of this license.
 ;; You must not remove this notice, or any other, from this software.
 
-(ns
-  leiningen.wabbit
+(ns leiningen.blutbad
 
-  (:require [leiningen.core
-             [utils :as cu]
-             [main :as cm]
-             [project :as pj]
-             [classpath :as cp]]
-            [leiningen
-             [jar :as jar]
-             [pom :as pom]
-             [javac :as lj]
-             [test :as lt]]
-            [clojure
-             [string :as cs]
-             [pprint :as pp]]
-            [robert.hooke :as h]
-            [clojure.java.io :as io])
+  (:require [leiningen.jar :as jar]
+            [leiningen.pom :as pom]
+            [leiningen.javac :as lj]
+            [leiningen.test :as lt]
+            [clojure.string :as cs]
+            [clojure.pprint :as pp]
+            [clojure.java.io :as io]
+            [leiningen.core.utils :as cu]
+            [leiningen.core.main :as cm]
+            [leiningen.core.project :as pj]
+            [leiningen.core.classpath :as cp])
 
   (:import [java.io
             File
@@ -94,7 +89,7 @@
 (defn- sanitize
 
   "Interpolate the string."
-  ^String [src data]
+  [src data]
 
   (reduce #(let [[k v] %2]
              (-> (cs/replace %1 (str "{{" k "}}") v)
@@ -107,32 +102,29 @@
   [project root]
 
   (let [c2 (.getContextClassLoader (Thread/currentThread))
-        bin (io/file root "bin")
-        pfx "czlab/wabbit/shared/bin/"
-        arr {"log4j2.xml" false
-             "wabbit" true
-             "wabbit.bat" false
-             "h2db-server" false}
         data {"kill-port" (str (:kill-port project))}
-        vmopts (cs/join " "
+        bin (doto (io/file root "bin") .mkdirs)
+        pfx "czlab/blutbad/shared/bin/"
+        arr {"log4j2.xml" false
+             "blutbad" true
+             "blutbad.bat" false
+             "h2db-server" false}
+        vmopts (cs/join \space
                         (->> (:jvm-opts project)
                              (map #(sanitize % data))))
         data (assoc data
                     "vmopts" vmopts
                     "agent" (str (:agentlib project)))]
-    (.mkdirs bin)
-    (doseq [[r edit?] arr
-            :let [res (str pfx r)
-                  u (.getResource c2 res)]
-            :when (some? u)]
-      (with-open [inp (.openStream u)]
-        (let [des (io/file bin r)]
-          (if-not edit?
-            (io/copy inp des)
-            (spit des
-                  (-> (slurp inp)
-                      (sanitize data))))
-          (.setExecutable des true))))))
+    (doseq [[r edit?] arr]
+      (when-some [u (.getResource c2 (str pfx r))]
+        (with-open [inp (.openStream u)]
+          (let [des (io/file bin r)]
+            (if-not edit?
+              (io/copy inp des)
+              (spit des
+                    (-> (slurp inp)
+                        (sanitize data))))
+            (.setExecutable des true)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- copy-dir
@@ -170,9 +162,9 @@
       (spit (io/file d "readme.txt") "log files"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn wabbit
+(defn blutbad
 
-  "Podify wabbit to standalone application."
+  "Podify blutbad to standalone application."
   [project & args]
 
   (let [dir (io/file (or (second (drop-while

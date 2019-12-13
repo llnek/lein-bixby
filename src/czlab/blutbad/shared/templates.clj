@@ -1,11 +1,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Original: https://github.com/technomancy/leiningen/src/leiningen/new/templates.clj
 ;;
-(ns
-  czlab.wabbit.shared.templates
+(ns czlab.blutbad.shared.templates
 
-  (:require [clojure.java.io :as io]
-            [clojure.string :as cs])
+  (:require [clojure.string :as cs]
+            [clojure.java.io :as io])
 
   (:import [java.util Calendar]
            [java.io BufferedReader File]))
@@ -13,7 +12,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; can't set this to stencil.core/render-string here because
 ;; pulling in the stencil lib in this library will cause
-;; classloading issues when used by lein-wabbit as a
+;; classloading issues when used by lein-blutbad as a
 ;; leiningen template.
 ;; this function should return back a string if using stencil
 (def ^:dynamic *renderer-fn* nil)
@@ -21,23 +20,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro
   ^:private trap!
-
-  "Throw an exception."
-  [s]
-
-  `(throw (Exception. (str ~s))))
+  [s] `(throw (Exception. (str ~s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- fix-line-seps
-
-  "Fix line separators."
   [s]
-
   (cs/replace s
               "\n"
               (if (System/getenv "LEIN_NEW_UNIX_NEWLINES")
-                "\n"
-                (System/getProperty "line.separator"))))
+                "\n" (System/getProperty "line.separator"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- slurp->lf
@@ -119,9 +110,8 @@
   "Get resource path."
   [path]
 
-  (let [p (cs/join "/"
-                   ["czlab/wabbit/shared/new" path])]
-    [p (io/resource p)]))
+  (let
+    [p (str "czlab/blutbad/shared/new/" path)] [p (io/resource p)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn renderer
@@ -170,14 +160,14 @@
   [{:as cli-options
     :keys [dir force?]} {:as data :keys [name]} & paths]
 
-  (if (or (= "." dir)
+  (if (or (.equals "." dir)
           (.mkdir (io/file dir)) force?)
     (doseq [path paths]
       (if (string? path)
         (.mkdirs (template-path dir path data))
         (let [[path content & options] path
               path (template-path dir path data)
-              options (apply hash-map options)]
+              options (apply array-map options)]
           (.mkdirs (.getParentFile path))
           (io/copy content (io/file path))
           (when (:executable options)

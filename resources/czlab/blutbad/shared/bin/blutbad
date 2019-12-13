@@ -2,15 +2,15 @@
 ##############################################################################
 ### osx sux, has no proper readlink.
 check_darwin() {
-  WABBIT_BIN=$( perl -e 'use Cwd "abs_path";print abs_path(shift)' $0 )
-  WABBIT_BIN=$( dirname $WABBIT_BIN )
-  WABBIT_HOME=$( dirname $WABBIT_BIN )
+  BLUTBAD_BIN=$( perl -e 'use Cwd "abs_path";print abs_path(shift)' $0 )
+  BLUTBAD_BIN=$( dirname $BLUTBAD_BIN )
+  BLUTBAD_HOME=$( dirname $BLUTBAD_BIN )
 }
 
 check_linux() {
-  WABBIT_BIN=$(dirname $(readlink -f $0))/../
-  WABBIT_HOME=$(readlink -f $WABBIT_BIN)
-  WABBIT_BIN=$WABBIT_HOME/bin
+  BLUTBAD_BIN=$(dirname $(readlink -f $0))/../
+  BLUTBAD_HOME=$(readlink -f $BLUTBAD_BIN)
+  BLUTBAD_BIN=$BLUTBAD_HOME/bin
 }
 
 ##############################################################################
@@ -23,9 +23,9 @@ else
 fi
 
 #############################################################################
-cd $WABBIT_HOME
+cd $BLUTBAD_HOME
 CWD=`pwd`
-#echo "Running wabbit from $CWD"
+#echo "Running blutbad from $CWD"
 
 ##############################################################################
 if [ "$JAVA_HOME" = "" ] ; then
@@ -36,10 +36,10 @@ if [ "$JAVA_HOME" = "" ] ; then
 fi
 
 ##############################################################################
-CONSCZ=czlab.wabbit.cons.con7
-MAINCZ=czlab.wabbit.exec
+CONSCZ=czlab.blutbad.cons.con7
+MAINCZ=czlab.blutbad.exec
 JCMD=$JAVA_HOME/bin/java
-LIBS=$WABBIT_HOME/lib/*
+LIBS=$BLUTBAD_HOME/lib/*
 
 ##############################################################################
 if [ ! -e "logs" ]; then
@@ -54,7 +54,7 @@ fi
 run_console() {
   local opts=$@
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ -domus \"$WABBIT_HOME\" $opts"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ -domus \"$BLUTBAD_HOME\" $opts"
 }
 
 ##############################################################################
@@ -66,9 +66,9 @@ get_procid() {
 show_proc() {
   get_procid
   if [ -n "$pid" ]; then
-    echo "wabbit is running with process-id: ${pid}."
+    echo "blutbad is running with process-id: ${pid}."
   else
-    echo "wabbit is not running."
+    echo "blutbad is not running."
   fi
 }
 
@@ -76,7 +76,7 @@ show_proc() {
 stop_proc() {
   get_procid
   if [ -n "$pid" ]; then
-    echo "wabbit is stopping with process-id: ${pid}."
+    echo "blutbad is stopping with process-id: ${pid}."
     #kill $pid
     cd /tmp
     wget http://{{kill-port}}/kill9 > /dev/null 2>&1
@@ -89,7 +89,7 @@ run_proc() {
   get_procid
   if [ -n "$pid" ]
   then
-    echo "wabbit is already running with process-id: ${pid}."
+    echo "blutbad is already running with process-id: ${pid}."
   elif [ "$2" = "-b" -o "$2" = "--background" ]
   then
     run_proc_bg
@@ -102,26 +102,26 @@ run_proc() {
 run_proc_bg() {
   exec sh -c \
     "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" $MAINCZ -domus \"$WABBIT_HOME\" $@ > /dev/null 2>&1 &"
+    -cp \"$LIBS\" $MAINCZ -domus \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
 run_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ -domus \"$WABBIT_HOME\" $@"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ -domus \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$WABBIT_HOME\" $@"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_bg() {
   exec sh -c \
     "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$WABBIT_HOME\" $@ > /dev/null 2>&1 &"
+    -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
@@ -129,7 +129,7 @@ debug_proc() {
   get_procid
   if [ -n "$pid" ]
   then
-    echo "wabbit is already running with process-id: ${pid}."
+    echo "blutbad is already running with process-id: ${pid}."
   elif [ "$2" = "-b" -o "$2" = "--background" ]
   then
     debug_proc_bg

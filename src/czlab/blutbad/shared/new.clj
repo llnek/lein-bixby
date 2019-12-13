@@ -6,14 +6,12 @@
 ;; the terms of this license.
 ;; You must not remove this notice, or any other, from this software.
 
-(ns
-  czlab.wabbit.shared.new
+(ns czlab.blutbad.shared.new
 
-  (:require [czlab.wabbit.shared.templates :as lein]
-            [clojure.java.io :as io]
-            [clojure
-             [pprint :as pp]
-             [string :as cs]])
+  (:require [czlab.blutbad.shared.templates :as lein]
+            [clojure.pprint :as pp]
+            [clojure.string :as cs]
+            [clojure.java.io :as io])
 
   (:import [java.rmi.server UID]
            [java.util UUID]
@@ -23,7 +21,7 @@
 (def
   ^:dynamic
   *template-name*
-  (or "wabbit"
+  (or "blutbad"
       (last (cs/split (str *ns*) #"\."))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,7 +30,7 @@
 (def
   ^:private
   template-files
-  {"conf/pod.conf" "pod.conf"
+  {"conf/app.conf" "app.conf"
 
    "etc"
    {"Resources_en.properties" identity
@@ -65,7 +63,7 @@
     "index_p4.ftl" "web/index_p4.ftl"
     "index.html" "web/index.html"}
 
-   "public/jsc/main"
+   "public/src/main"
    {"main.js" "web/main.js"}
 
    "public/css/main"
@@ -84,27 +82,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- is-windows?
-
-  "Is platform Windows?"
   []
-
-  (number? (cs/index-of
-             (cs/lower-case (System/getProperty "os.name")) "windows")))
+  (cs/index-of
+    (cs/lower-case (System/getProperty "os.name")) "windows"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- strip-ls
-
-  "Strip leading slashes."
+  "Remove leading slashes."
   [s]
-
   (cs/replace s #"^[/]+" ""))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- juid
-
   "Generate a unique id."
   []
-
   (.replaceAll (str (UID.)) "[:\\-]+" ""))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -112,18 +103,14 @@
   ^:private explode-path
 
   "Break down a file path."
-  [s]
-
-  `(remove empty? (cs/split ~s #"/")))
+  [s] `(remove empty? (cs/split ~s #"/")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro
   ^:private sanitize-path
 
   "Clean up a file path."
-  [s]
-
-  `(cs/join "/" (explode-path ~s)))
+  [s] `(cs/join "/" (explode-path ~s)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- do-render
@@ -131,11 +118,12 @@
   "Render a file."
   [tfiles data]
 
-  (let [render (fn [path data]
-                 (if (some #(cs/ends-with? path %)
-                           [".png" ".ico" ".jpg" ".gif"])
-                   ((lein/raw-resourcer *template-name*) path)
-                   ((lein/renderer *template-name*) path data)))]
+  (letfn
+    [(render [path data]
+       (if (some #(cs/ends-with? path %)
+                 [".png" ".ico" ".jpg" ".gif"])
+         ((lein/raw-resourcer *template-name*) path)
+         ((lein/renderer *template-name*) path data)))]
     (reduce #(if (string? %2)
                (conj %1 %2)
                (conj %1 [(first %2) (render (last %2) data)])) [] tfiles)))
@@ -166,32 +154,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn new<>
 
-  "Leiningen template for creating a czlab/wabbit application."
+  "Leiningen template for creating a czlab/blutbad application."
   [name options & args]
 
-  (let [args (if (empty? args) ["-web"] args)
-        web? (cs/index-of (cs/lower-case
-                            (str (first args))) "web")
+  (let [args (if (empty? args) '("-web") args)
         render-fn (:renderer-fn options)
         main-ns (lein/sanitize-nsp name)
         pod (last (cs/split main-ns #"\."))
         uid (str (UUID/randomUUID))
-        h2dbUrl (str (->> [(if (is-windows?)
-                             "/c:/windows/temp" "/tmp") (juid) pod]
-                       (cs/join "/"))
-                     ";MVCC=TRUE;AUTO_RECONNECT=TRUE")
-        data {:nested-dirs (lein/name->path main-ns)
-              :h2dbpath h2dbUrl
-              :domain main-ns
-              :raw-name name
+        web? (cs/index-of (cs/lower-case
+                            (str (first args))) "web")
+        data {:domain main-ns
               :project pod
-              :ver "0.1"
+              :ver "0.0.1"
               :name name
               :year (lein/year)
               :date (lein/date)
               :app-key (cs/replace uid #"-" "")
               :app-type (if web? "web" "server")
-              :user (System/getProperty "user.name")}]
+              :user (System/getProperty "user.name")
+              :nested-dirs (lein/name->path main-ns)
+              :h2dbpath (-> (cs/join \space
+                                     [(if-not (is-windows?)
+                                        "/tmp"
+                                        "/c:/windows/temp") (juid) pod])
+                            (str ";AUTO_RECONNECT=TRUE"))}]
     (binding [lein/*renderer-fn* render-fn]
       (apply lein/x->files
              (dissoc options :renderer-fn)

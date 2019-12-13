@@ -4,12 +4,12 @@ set CWD=%CD%
 set ARGC=0
 for %%x in (%*) do set /A ARGC+=1
 
-set wabbit_HOME=%~dp0..
+set blutbad_HOME=%~dp0..
 set BINDIR=%~dp0
-set PATCHDIR=%wabbit_HOME%\patch\*
-set DISTRO=%wabbit_HOME%\dist\exec\*
-set BOOT=%wabbit_HOME%\dist\boot\*
-set LIBDIR=%wabbit_HOME%\lib\*
+set PATCHDIR=%blutbad_HOME%\patch\*
+set DISTRO=%blutbad_HOME%\dist\exec\*
+set BOOT=%blutbad_HOME%\dist\boot\*
+set LIBDIR=%blutbad_HOME%\lib\*
 
 set BCP=%BOOT%;%LIBDIR%;%CLASSPATH%
 set LOG4J=etc\log\logback.xml
@@ -17,19 +17,19 @@ set L4JFILE=%CD%\%LOG4J%
 set L4J=file:/%L4JFILE%
 set LOGCFG=%L4J:\=/%
 set LOGREF=-Dlogback.configurationFile=%LOGCFG%
-set BASEDIR=-Dwabbit.home=%wabbit_HOME%
+set BASEDIR=-Dblutbad.home=%blutbad_HOME%
 set BG=false
 set DBGOPTS=
 set ECODE=0
 set KPORT=4444
-set KILLPORT=-Dwabbit.kill.port=%KPORT%
-set LIBP=-Djava.library.path=$wabbit_HOME/bin
+set KILLPORT=-Dblutbad.kill.port=%KPORT%
+set LIBP=-Djava.library.path=$blutbad_HOME/bin
 set NETTY=-Dio.netty.eventLoopThreads=16
 
 set JPROF=-agentpath:/Applications/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849
 set VMXRGS=-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:MaxPermSize=256m
-set CLDR=-Djava.system.class.loader=com.zotohlab.wabbit.loaders.ExecClassLoader
-set MAINCZ=czlab.wabbit.etc.core
+set CLDR=-Djava.system.class.loader=com.zotohlab.blutbad.loaders.ExecClassLoader
+set MAINCZ=czlab.blutbad.etc.core
 
 if NOT EXIST %L4JFILE% SET LOGREF=
 
@@ -56,11 +56,11 @@ REM run in foreground
 REM ********************************************************
 cd %BINDIR%
 :appfg
-REM CMDLINE="%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%wabbit_HOME%" %*
+REM CMDLINE="%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%blutbad_HOME%" %*
 if %BG% == "true" goto runcmd
 call :splash
 :runcmd
-"%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%wabbit_HOME%" %*
+"%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%blutbad_HOME%" %*
 set ECODE=%ERRORLEVEL%
 goto end
 
