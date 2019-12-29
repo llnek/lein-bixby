@@ -37,7 +37,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- clean-dir
 
-  "Clena out recursively a directory with native Java.
+  "Clean out recursively a directory with native Java.
   https://docs.oracle.com/javase/tutorial/essential/io/walk.html"
   [dir]
 
@@ -106,9 +106,9 @@
         bin (doto (io/file root "bin") .mkdirs)
         pfx "czlab/blutbad/shared/bin/"
         arr {"log4j2.xml" false
-             "blutbad" true
-             "blutbad.bat" false
-             "h2db-server" false}
+             "blutbad" true}
+             ;"blutbad.bat" false
+             ;"h2db-server" false}
         vmopts (cs/join \space
                         (->> (:jvm-opts project)
                              (map #(sanitize % data))))
@@ -151,8 +151,6 @@
   [project toDir]
 
   (let [dirs ["conf" "etc" "src" "doc" "public"]]
-    (.mkdir (io/file toDir))
-    (clean-dir toDir)
     (doseq [d dirs
             :let [src (io/file (:root project) d)]]
       (copy-dir src (io/file toDir d)))
@@ -170,6 +168,8 @@
   (let [dir (io/file (or (second (drop-while
                                    #(not= "--to-dir" %) args))
                          (io/file (:root project) pkg-dir)))]
+    (.mkdir (io/file dir))
+    (clean-dir dir)
     (pack-lib project dir)
     (pack-files project dir)))
 

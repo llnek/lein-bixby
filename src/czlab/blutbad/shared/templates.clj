@@ -20,7 +20,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro
   ^:private trap!
-  [s] `(throw (Exception. (str ~s))))
+  [fmt & args] `(throw (Exception. (str (format ~fmt ~@args)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- fix-line-seps
@@ -75,7 +75,8 @@
   "Sanitize a namespace."
   [s]
 
-  (-> (cs/replace s "/" ".") (cs/replace "_" "-")))
+  (cs/join "."
+           (remove empty? (cs/split s #"[/.]+"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn group-name
@@ -131,7 +132,7 @@
            (if (nil? data)
              (io/reader r)
              (render (slurp-resource r) data))
-           (trap! (format "Resource '%s' not found" p))))))))
+           (trap! "Resource '%s' not found" p)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn raw-resourcer
@@ -143,7 +144,7 @@
     (let [[p r] (res-path file)]
       (if r
         (io/input-stream r)
-        (trap! (format "Resource '%s' not found" p))))))
+        (trap! "Resource '%s' not found" p)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- template-path
@@ -157,25 +158,25 @@
 (defn x->files
 
   "Generate output files from templates."
-  [{:as cli-options
-    :keys [dir force?]} {:as data :keys [name]} & paths]
+  [{:keys [to-dir dir force?]} {:as data :keys [name]} paths]
 
-  (if (or (.equals "." dir)
-          (.mkdir (io/file dir)) force?)
-    (doseq [path paths]
-      (if (string? path)
-        (.mkdirs (template-path dir path data))
-        (let [[path content & options] path
-              path (template-path dir path data)
-              options (apply array-map options)]
-          (.mkdirs (.getParentFile path))
-          (io/copy content (io/file path))
-          (when (:executable options)
-            (.setExecutable path true)))))
-    (trap! (str "Could not create directory "
-                dir
-                ". Maybe it already exists?"
-                "  See also :force or --force"))))
+  (let [out (if (cs/blank? to-dir) dir to-dir)]
+    (if (or (.equals "." out)
+            (.mkdirs (io/file out)) force?)
+      (doseq [path paths]
+        (if (string? path)
+          (.mkdirs (template-path dir path data))
+          (let [[path content & options] path
+                path (template-path dir path data)
+                options (apply array-map options)]
+            (.mkdirs (.getParentFile path))
+            (io/copy content (io/file path))
+            (when (:executable options)
+              (.setExecutable path true)))))
+      (trap! (str "Could not create directory "
+                  dir
+                  ". Maybe it already exists?"
+                  "  See also :force or --force")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF

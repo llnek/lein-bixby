@@ -9,6 +9,7 @@
 (ns czlab.blutbad.shared.new
 
   (:require [czlab.blutbad.shared.templates :as lein]
+            [leiningen.core.main :as main]
             [clojure.pprint :as pp]
             [clojure.string :as cs]
             [clojure.java.io :as io])
@@ -32,12 +33,10 @@
   template-files
   {"conf/app.conf" "app.conf"
 
-   "etc"
-   {"Resources_en.properties" identity
-    "mime.properties" identity
-    "log4j2c.xml" identity
-    "log4j2d.xml" identity
-    "shiro.ini" identity}
+   "etc" {"mime.properties" identity
+          "log4j2c.xml" identity
+          "log4j2d.xml" identity
+          "Resources_en.properties" identity}
 
    "src/main/clojure/{{nested-dirs}}"
    {"core.clj" "src/{{app-type}}.clj"}
@@ -52,21 +51,17 @@
    ;;{"ClojureJUnit.java" "src/ClojureJUnit.java"
    ;;"JUnit.java" "src/JUnit.java"}
 
-   "public/res/main"
+   "public/res"
    {"favicon.png" "web/favicon.png"
     "favicon.ico" "web/favicon.ico"}
 
-   "public/htm/main"
-   {"index_p1.ftl" "web/index_p1.ftl"
-    "index_p2.ftl" "web/index_p2.ftl"
-    "index_p3.ftl" "web/index_p3.ftl"
-    "index_p4.ftl" "web/index_p4.ftl"
-    "index.html" "web/index.html"}
+   "public/htm"
+   {"index.html" "web/index.html"}
 
-   "public/src/main"
+   "public/src"
    {"main.js" "web/main.js"}
 
-   "public/css/main"
+   "public/css"
    {"main.css" "web/main.scss"}
 
    ".gitignore" "gitignore"
@@ -126,7 +121,8 @@
          ((lein/renderer *template-name*) path data)))]
     (reduce #(if (string? %2)
                (conj %1 %2)
-               (conj %1 [(first %2) (render (last %2) data)])) [] tfiles)))
+               (conj %1 [(first %2)
+                         (render (last %2) data)])) [] tfiles)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- traverse
@@ -155,35 +151,47 @@
 (defn new<>
 
   "Leiningen template for creating a czlab/blutbad application."
-  [name options & args]
+  [name options args]
 
-  (let [args (if (empty? args) '("-web") args)
-        render-fn (:renderer-fn options)
+  (let [{:keys [dir to-dir
+                renderer-fn]} options
+        proj (->> (-> name
+                      (cs/includes? "/")
+                      (if #"[/]+" #"[.]+"))
+                  (cs/split name) last)
+        _ (if-not (and proj
+                       (> (count proj) 0))
+            (throw (Exception. "Bad project name.")))
         main-ns (lein/sanitize-nsp name)
-        pod (last (cs/split main-ns #"\."))
         uid (str (UUID/randomUUID))
-        web? (cs/index-of (cs/lower-case
-                            (str (first args))) "web")
+        web? true
         data {:domain main-ns
-              :project pod
+              :project proj
+              :encoding "UTF-8"
               :ver "0.0.1"
               :name name
               :year (lein/year)
               :date (lein/date)
+              :title (format "Project %s." proj)
               :app-key (cs/replace uid #"-" "")
               :app-type (if web? "web" "server")
               :user (System/getProperty "user.name")
               :nested-dirs (lein/name->path main-ns)
-              :h2dbpath (-> (cs/join \space
+              :description (format "Project %s: Home Page." proj)
+              :h2dbpath (-> (cs/join "/"
                                      [(if-not (is-windows?)
                                         "/tmp"
-                                        "/c:/windows/temp") (juid) pod])
+                                        "/c:/windows/temp") (juid) proj])
                             (str ";AUTO_RECONNECT=TRUE"))}]
-    (binding [lein/*renderer-fn* render-fn]
-      (apply lein/x->files
-             (dissoc options :renderer-fn)
-             data
-             (-> (traverse "" template-files) (do-render data))))))
+    ;(main/info (format "to-dir = %s" to-dir))
+    ;(main/info (format "dir = %s" dir))
+    (binding [lein/*renderer-fn* renderer-fn]
+      (lein/x->files
+        (assoc (dissoc options :renderer-fn)
+               :dir
+               (.getCanonicalPath (io/file dir proj)))
+        data
+        (-> (traverse "" template-files) (do-render data))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF

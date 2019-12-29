@@ -6,47 +6,18 @@
 
   {{domain}}.core
 
-  (:require [czlab.blutbad.xpis :as xp]
-            [czlab.niou.core :as cc]
-            [czlab.basal.core :as c]
-            [czlab.basal.xpis :as po]
-            [czlab.blutbad.plugs.mvc :as mvc])
+  (:require [czlab.niou.core :as cc]
+            [czlab.basal.core :as c])
 
   (:import [java.io File]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- ftl-context
-  []
-  {:landing
-             {:title_line "Sample Web App"
-              :title_2 "Demo blutbad"
-              :tagline "Say something" }
-   :about
-             {:title "About blutbad demo" }
-   :services {}
-   :contact {:email "a@b.com"}
-   :description "blutbad web app"
-   :encoding "utf-8"
-   :title "blutbad|Sample"})
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn dft-handler
-  [evt res]
-  (c/do-with
-    [ch (:socket evt)]
-    (let
-      [plug (xp/get-pluglet evt)
-       svr (po/parent plug)
-       ri (get-in evt
-                  [:route :info])
-       tpl (:template ri)
-       {:keys [data ctype]}
-       (if (c/hgl? tpl)
-         (mvc/load-template plug tpl (ftl-context)))]
-      (->>
-        (-> (cc/res-header-set res "content-type" ctype)
-            (assoc :body data))
-        cc/reply-result ))))
+
+  [evt]
+
+  (cc/reply-result (cc/http-result evt)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn app-main

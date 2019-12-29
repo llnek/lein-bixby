@@ -2,9 +2,9 @@
 ##############################################################################
 ### osx sux, has no proper readlink.
 check_darwin() {
-  BLUTBAD_BIN=$( perl -e 'use Cwd "abs_path";print abs_path(shift)' $0 )
-  BLUTBAD_BIN=$( dirname $BLUTBAD_BIN )
-  BLUTBAD_HOME=$( dirname $BLUTBAD_BIN )
+  BLUTBAD_BIN=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)
+  BLUTBAD_BIN=$(dirname $BLUTBAD_BIN)
+  BLUTBAD_HOME=$(dirname $BLUTBAD_BIN)
 }
 
 check_linux() {
@@ -54,12 +54,12 @@ fi
 run_console() {
   local opts=$@
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ -domus \"$BLUTBAD_HOME\" $opts"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ --home \"$BLUTBAD_HOME\" $opts"
 }
 
 ##############################################################################
 get_procid() {
-  pid=$( ps -ef | grep -F $MAINCZ | grep -v grep | awk '{print $2}' )
+  pid=$(ps -ef | grep -F $MAINCZ | grep -v grep | awk '{print $2}')
 }
 
 ##############################################################################
@@ -77,10 +77,7 @@ stop_proc() {
   get_procid
   if [ -n "$pid" ]; then
     echo "blutbad is stopping with process-id: ${pid}."
-    #kill $pid
-    cd /tmp
-    wget http://{{kill-port}}/kill9 > /dev/null 2>&1
-    cd $CWD
+    kill $pid
   fi
 }
 
@@ -102,26 +99,26 @@ run_proc() {
 run_proc_bg() {
   exec sh -c \
     "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" $MAINCZ -domus \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
 run_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ -domus \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_bg() {
   exec sh -c \
     "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" {{agent}} $MAINCZ -domus \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    -cp \"$LIBS\" {{agent}} $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################

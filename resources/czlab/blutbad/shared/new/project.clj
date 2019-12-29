@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defproject {{raw-name}} "{{ver}}"
+(defproject {{name}} "{{ver}}"
 
   :description "FIXME: write description"
   :url "http://example.com/FIXME"

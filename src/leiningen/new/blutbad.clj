@@ -24,19 +24,18 @@
   "A lein template for creating a czlab/blutbad application."
   [name & args]
 
-  ;;(main/debug (str "args= " args))
+  ;(main/info (format "name=%s, args= %s" name args))
   (try
     (main/info
       (format "Generating new %s project..." ws/*template-name*))
-    (apply ws/new<>
-           name
-           {:template-version *template-version*
-            :use-snapshots? *use-snapshots?*
-            :renderer-fn sc/render-string
-            :force? *force?*
-            :dir (or *dir*
-                     (-> "leiningen.original.pwd"
-                         System/getProperty (io/file name) .getPath))} args)
+    (ws/new<> name
+              {:template-version *template-version*
+               :use-snapshots? *use-snapshots?*
+               :renderer-fn sc/render-string
+               :force? *force?*
+               :to-dir *dir*
+               :dir (System/getProperty
+                      "leiningen.original.pwd")} args)
     (catch Throwable t
       (.printStackTrace t)
       (main/abort (.getMessage t)))))
