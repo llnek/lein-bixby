@@ -73,7 +73,7 @@ show_proc() {
 }
 
 ##############################################################################
-stop_proc() {
+kill_proc() {
   get_procid
   if [ -n "$pid" ]; then
     echo "blutbad is stopping with process-id: ${pid}."
@@ -93,6 +93,12 @@ run_proc() {
   else
     run_proc_fg
   fi
+}
+
+##############################################################################
+stop_proc() {
+  exec sh -c \
+    "exec $JCMD {{vmopts}} -cp \"$LIBS\" czlab.blutbad.cons.con4 --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
@@ -140,6 +146,7 @@ case $1 in
   start | run ) run_proc $@ ;;
   debug ) debug_proc $@ ;;
   status ) show_proc $@ ;;
+  kill ) kill_proc $@ ;;
   stop ) stop_proc $@ ;;
   *) run_console $@ ;;
 esac

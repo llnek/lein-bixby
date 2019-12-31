@@ -17,7 +17,7 @@
             [cider/cider-nrepl "0.22.4"]
             [lein-codox "0.10.7"]]
 
-  :kill-port "localhost:4444"
+  :kill-port 4444
   :profiles
   {:podify
    {:agentlib "-agentlib:jdwp=transport=dt_socket,server=y,address=8787,suspend=n"
@@ -35,6 +35,7 @@
   :aot :all
 
   :aliases {"blutbad-deploy" ["with-profile" "podify" "blutbad"]
+            "blutbad-stop" ["trampoline" "run" "-m" "czlab.blutbad.cons.con4"]
             "blutbad-run" ["trampoline" "run" "-m" "czlab.blutbad.exec"]
             "blutbad-console" ["trampoline" "run" "-m" "czlab.blutbad.cons.con7"]}
 
