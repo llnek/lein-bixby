@@ -106,9 +106,9 @@
         bin (doto (io/file root "bin") .mkdirs)
         pfx "czlab/blutbad/shared/bin/"
         arr {"log4j2.xml" false
-             "blutbad" true}
              ;"blutbad.bat" false
-             ;"h2db-server" false}
+             "h2db" true
+             "blutbad" true}
         vmopts (cs/join \space
                         (->> (:jvm-opts project)
                              (map #(sanitize % data))))

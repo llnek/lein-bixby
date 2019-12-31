@@ -40,6 +40,9 @@ CONSCZ=czlab.blutbad.cons.con7
 MAINCZ=czlab.blutbad.exec
 JCMD=$JAVA_HOME/bin/java
 LIBS=$BLUTBAD_HOME/lib/*
+VMOPTS="{{vmopts}}"
+AGENT="{{agent}}"
+
 
 ##############################################################################
 if [ ! -e "logs" ]; then
@@ -54,7 +57,7 @@ fi
 run_console() {
   local opts=$@
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $CONSCZ --home \"$BLUTBAD_HOME\" $opts"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $CONSCZ --home \"$BLUTBAD_HOME\" $opts"
 }
 
 ##############################################################################
@@ -98,33 +101,31 @@ run_proc() {
 ##############################################################################
 stop_proc() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" czlab.blutbad.cons.con4 --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" czlab.blutbad.cons.con4 --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 run_proc_bg() {
   exec sh -c \
-    "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
 run_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_fg() {
   exec sh -c \
-    "exec $JCMD {{vmopts}} -cp \"$LIBS\" {{agent}} $MAINCZ --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BLUTBAD_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_bg() {
   exec sh -c \
-    "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" {{agent}} $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
@@ -153,5 +154,5 @@ esac
 
 
 ##############################################################################
-#EOF 
+#EOF
 
