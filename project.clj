@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The group name is the template name, so in this case the template-name
 ;; is 'blutbad'
-(defproject blutbad/lein-template "1.1.0"
+(defproject blutbad/lein-template "2.0.0"
 
   :description "A leiningen template for creating a czlab/blutbad application"
 

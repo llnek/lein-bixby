@@ -11,9 +11,9 @@
   [[org.clojure/clojurescript "1.10.597"]
    [org.clojure/clojure "1.10.1"]
    [commons-logging "1.2"]
-   [io.czlab/blutbad "1.1.0"]]
+   [io.czlab/blutbad "2.0.0"]]
 
-  :plugins [[blutbad/lein-template "1.1.0"]
+  :plugins [[blutbad/lein-template "2.0.0"]
             [cider/cider-nrepl "0.22.4"]
             [lein-codox "0.10.7"]]
 

@@ -65,7 +65,6 @@
    {"main.css" "web/main.scss"}
 
    ".gitignore" "gitignore"
-   "CHANGELOG.md" identity
 
    "doc" {"intro.md" "intro.md"}
 
