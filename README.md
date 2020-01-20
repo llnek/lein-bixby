@@ -7,7 +7,7 @@ A lein template for creating a czlab/blutbad application
 
 Add the following dependency to your `project.clj` file:
 
-    [io.czlab/lein-blutbad "2.0.0"]
+    [io.czlab/lein-blutbad "2.0.1"]
 
 ## Documentation
 
