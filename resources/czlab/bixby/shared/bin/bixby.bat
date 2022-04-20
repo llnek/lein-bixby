@@ -4,12 +4,12 @@ set CWD=%CD%
 set ARGC=0
 for %%x in (%*) do set /A ARGC+=1
 
-set blutbad_HOME=%~dp0..
+set BIXBY_HOME=%~dp0..
 set BINDIR=%~dp0
-set PATCHDIR=%blutbad_HOME%\patch\*
-set DISTRO=%blutbad_HOME%\dist\exec\*
-set BOOT=%blutbad_HOME%\dist\boot\*
-set LIBDIR=%blutbad_HOME%\lib\*
+set PATCHDIR=%BIXBY_HOME%\patch\*
+set DISTRO=%BIXBY_HOME%\dist\exec\*
+set BOOT=%BIXBY_HOME%\dist\boot\*
+set LIBDIR=%BIXBY_HOME%\lib\*
 
 set BCP=%BOOT%;%LIBDIR%;%CLASSPATH%
 set LOG4J=etc\log\logback.xml
@@ -17,19 +17,19 @@ set L4JFILE=%CD%\%LOG4J%
 set L4J=file:/%L4JFILE%
 set LOGCFG=%L4J:\=/%
 set LOGREF=-Dlogback.configurationFile=%LOGCFG%
-set BASEDIR=-Dblutbad.home=%blutbad_HOME%
+set BASEDIR=-Dbixby.home=%BIXBY_HOME%
 set BG=false
 set DBGOPTS=
 set ECODE=0
 set KPORT=4444
-set KILLPORT=-Dblutbad.kill.port=%KPORT%
-set LIBP=-Djava.library.path=$blutbad_HOME/bin
+set KILLPORT=-Dbixby.kill.port=%KPORT%
+set LIBP=-Djava.library.path=$BIXBY_HOME/bin
 set NETTY=-Dio.netty.eventLoopThreads=16
 
 set JPROF=-agentpath:/Applications/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849
 set VMXRGS=-XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:MaxPermSize=256m
-set CLDR=-Djava.system.class.loader=com.zotohlab.blutbad.loaders.ExecClassLoader
-set MAINCZ=czlab.blutbad.etc.core
+set CLDR=-Djava.system.class.loader=com.zotohlab.bixby.loaders.ExecClassLoader
+set MAINCZ=czlab.bixby.etc.core
 
 if NOT EXIST %L4JFILE% SET LOGREF=
 
@@ -56,11 +56,11 @@ REM run in foreground
 REM ********************************************************
 cd %BINDIR%
 :appfg
-REM CMDLINE="%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%blutbad_HOME%" %*
+REM CMDLINE="%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%BIXBY_HOME%" %*
 if %BG% == "true" goto runcmd
 call :splash
 :runcmd
-"%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%blutbad_HOME%" %*
+"%JAVA_CMD%" -cp "%BCP%" "%LIBP%" %DBGOPTS% "%LOGREF%" "%NETTY%" "%KILLPORT%" "%BASEDIR%" %CLDR% %MAINCZ% "%BIXBY_HOME%" %*
 set ECODE=%ERRORLEVEL%
 goto end
 

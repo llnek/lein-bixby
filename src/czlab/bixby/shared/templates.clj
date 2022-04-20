@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Original: https://github.com/technomancy/leiningen/src/leiningen/new/templates.clj
 ;;
-(ns czlab.blutbad.shared.templates
+(ns czlab.bixby.shared.templates
 
   (:require [clojure.string :as cs]
             [clojure.java.io :as io])
@@ -12,7 +12,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; can't set this to stencil.core/render-string here because
 ;; pulling in the stencil lib in this library will cause
-;; classloading issues when used by lein-blutbad as a
+;; classloading issues when used by lein-bixby as a
 ;; leiningen template.
 ;; this function should return back a string if using stencil
 (def ^:dynamic *renderer-fn* nil)
@@ -112,7 +112,7 @@
   [path]
 
   (let
-    [p (str "czlab/blutbad/shared/new/" path)] [p (io/resource p)]))
+    [p (str "czlab/bixby/shared/new/" path)] [p (io/resource p)]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn renderer

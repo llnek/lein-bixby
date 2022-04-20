@@ -9,7 +9,7 @@
         <h2 class="subtitle">${landing.title_2}</h2>
         <h3 class="tagline">${landing.tagline}</h3>
 
-        <p><a href="/download/" class="btn btn-default btn-lg">Download blutbad now</a></p>
+        <p><a href="/download/" class="btn btn-default btn-lg">Download bixby now</a></p>
 
       </div>
     </div>

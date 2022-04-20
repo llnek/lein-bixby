@@ -2,15 +2,15 @@
 ##############################################################################
 ### osx sux, has no proper readlink.
 check_darwin() {
-  BLUTBAD_BIN=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)
-  BLUTBAD_BIN=$(dirname $BLUTBAD_BIN)
-  BLUTBAD_HOME=$(dirname $BLUTBAD_BIN)
+  BIXBY_BIN=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)
+  BIXBY_BIN=$(dirname $BIXBY_BIN)
+  BIXBY_HOME=$(dirname $BIXBY_BIN)
 }
 
 check_linux() {
-  BLUTBAD_BIN=$(dirname $(readlink -f $0))/../
-  BLUTBAD_HOME=$(readlink -f $BLUTBAD_BIN)
-  BLUTBAD_BIN=$BLUTBAD_HOME/bin
+  BIXBY_BIN=$(dirname $(readlink -f $0))/../
+  BIXBY_HOME=$(readlink -f $BIXBY_BIN)
+  BIXBY_BIN=$BIXBY_HOME/bin
 }
 
 ##############################################################################
@@ -23,7 +23,7 @@ else
 fi
 
 #############################################################################
-cd $BLUTBAD_HOME
+cd $BIXBY_HOME
 CWD=`pwd`
 
 ##############################################################################
@@ -39,7 +39,7 @@ MAINZ=czlab.hoard.h2db.server
 
 ##############################################################################
 JCMD=$JAVA_HOME/bin/java
-LIBS=$BLUTBAD_HOME/lib/*
+LIBS=$BIXBY_HOME/lib/*
 
 TCPPORT=9092
 TCPURL=tcp://localhost:$TCPPORT
@@ -49,7 +49,7 @@ DBUSER=sa
 DBPWD=admin123 
 
 DBDIR=/tmp
-DBID=blutbad
+DBID=bixby
 
 WEBPWD=admin123
 WEBPORT=8082
@@ -85,7 +85,7 @@ start_web() {
 run_proc_bg() {
   exec sh -c \
     "exec nohup $JCMD {{vmopts}} \
-    -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    -cp \"$LIBS\" $MAINCZ --home \"$BIXBY_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################

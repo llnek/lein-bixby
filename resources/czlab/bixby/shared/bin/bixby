@@ -2,15 +2,15 @@
 ##############################################################################
 ### osx sux, has no proper readlink.
 check_darwin() {
-  BLUTBAD_BIN=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)
-  BLUTBAD_BIN=$(dirname $BLUTBAD_BIN)
-  BLUTBAD_HOME=$(dirname $BLUTBAD_BIN)
+  BIXBY_BIN=$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)
+  BIXBY_BIN=$(dirname $BIXBY_BIN)
+  BIXBY_HOME=$(dirname $BIXBY_BIN)
 }
 
 check_linux() {
-  BLUTBAD_BIN=$(dirname $(readlink -f $0))/../
-  BLUTBAD_HOME=$(readlink -f $BLUTBAD_BIN)
-  BLUTBAD_BIN=$BLUTBAD_HOME/bin
+  BIXBY_BIN=$(dirname $(readlink -f $0))/../
+  BIXBY_HOME=$(readlink -f $BIXBY_BIN)
+  BIXBY_BIN=$BIXBY_HOME/bin
 }
 
 ##############################################################################
@@ -23,9 +23,9 @@ else
 fi
 
 #############################################################################
-cd $BLUTBAD_HOME
+cd $BIXBY_HOME
 CWD=`pwd`
-#echo "Running blutbad from $CWD"
+#echo "Running bixby from $CWD"
 
 ##############################################################################
 if [ "$JAVA_HOME" = "" ] ; then
@@ -36,10 +36,10 @@ if [ "$JAVA_HOME" = "" ] ; then
 fi
 
 ##############################################################################
-CONSCZ=czlab.blutbad.cons.con7
-MAINCZ=czlab.blutbad.exec
+CONSCZ=czlab.bixby.cons.con7
+MAINCZ=czlab.bixby.exec
 JCMD=$JAVA_HOME/bin/java
-LIBS=$BLUTBAD_HOME/lib/*
+LIBS=$BIXBY_HOME/lib/*
 VMOPTS="{{vmopts}}"
 AGENT="{{agent}}"
 
@@ -57,7 +57,7 @@ fi
 run_console() {
   local opts=$@
   exec sh -c \
-    "exec $JCMD $VMOPTS -cp \"$LIBS\" $CONSCZ --home \"$BLUTBAD_HOME\" $opts"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $CONSCZ --home \"$BIXBY_HOME\" $opts"
 }
 
 ##############################################################################
@@ -69,9 +69,9 @@ get_procid() {
 show_proc() {
   get_procid
   if [ -n "$pid" ]; then
-    echo "blutbad is running with process-id: ${pid}."
+    echo "bixby is running with process-id: ${pid}."
   else
-    echo "blutbad is not running."
+    echo "bixby is not running."
   fi
 }
 
@@ -79,7 +79,7 @@ show_proc() {
 kill_proc() {
   get_procid
   if [ -n "$pid" ]; then
-    echo "blutbad is stopping with process-id: ${pid}."
+    echo "bixby is stopping with process-id: ${pid}."
     kill $pid
   fi
 }
@@ -89,7 +89,7 @@ run_proc() {
   get_procid
   if [ -n "$pid" ]
   then
-    echo "blutbad is already running with process-id: ${pid}."
+    echo "bixby is already running with process-id: ${pid}."
   elif [ "$2" = "-b" -o "$2" = "--background" ]
   then
     run_proc_bg
@@ -101,31 +101,31 @@ run_proc() {
 ##############################################################################
 stop_proc() {
   exec sh -c \
-    "exec $JCMD $VMOPTS -cp \"$LIBS\" czlab.blutbad.cons.con4 --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" czlab.bixby.cons.con4 --home \"$BIXBY_HOME\" $@"
 }
 
 ##############################################################################
 run_proc_bg() {
   exec sh -c \
-    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BIXBY_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
 run_proc_fg() {
   exec sh -c \
-    "exec $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $MAINCZ --home \"$BIXBY_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_fg() {
   exec sh -c \
-    "exec $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BLUTBAD_HOME\" $@"
+    "exec $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BIXBY_HOME\" $@"
 }
 
 ##############################################################################
 debug_proc_bg() {
   exec sh -c \
-    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BLUTBAD_HOME\" $@ > /dev/null 2>&1 &"
+    "exec nohup $JCMD $VMOPTS -cp \"$LIBS\" $AGENT $MAINCZ --home \"$BIXBY_HOME\" $@ > /dev/null 2>&1 &"
 }
 
 ##############################################################################
@@ -133,7 +133,7 @@ debug_proc() {
   get_procid
   if [ -n "$pid" ]
   then
-    echo "blutbad is already running with process-id: ${pid}."
+    echo "bixby is already running with process-id: ${pid}."
   elif [ "$2" = "-b" -o "$2" = "--background" ]
   then
     debug_proc_bg

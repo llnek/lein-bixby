@@ -1,13 +1,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The group name is the template name, so in this case the template-name
-;; is 'blutbad'
-(defproject blutbad/lein-template "2.0.1"
+;; is 'bixby'
+(defproject bixby/lein-template "2.1.0"
 
-  :description "A leiningen template for creating a czlab/blutbad application"
+  :description "A leiningen template for creating a czlab/bixby application"
 
-  :license {:url "http://www.eclipse.org/legal/epl-v10.html"
-            :name "Eclipse Public License"}
-  :url "https://github.com/llnek/lein-blutbad"
+  :license {:url "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            :name "Apache License"}
+
+  :url "https://github.com/llnek/lein-bixby"
 
   :dependencies []
   :target-path "target/%s"
