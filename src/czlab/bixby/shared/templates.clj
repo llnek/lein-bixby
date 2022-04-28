@@ -49,7 +49,6 @@
   "Read and sanitize a resource."
   [res]
 
-  ; for 2.0.0 compatibility, can break in 3.0.0
   (-> (if (string? res)
         (io/resource res) res) io/reader slurp->lf fix-line-seps))
 
