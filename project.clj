@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The group name is the template name, so in this case the template-name
 ;; is 'bixby'
-(defproject bixby/lein-template "2.1.0"
+(defproject bixby/lein-template "2.2.0"
 
   :description "A leiningen template for creating a czlab/bixby application"
 
