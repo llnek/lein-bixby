@@ -10,9 +10,9 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 ;;
-;; Copyright © 2013-2022, Kenneth Leung. All rights reserved.
+;; Copyright © 2013-2024, Kenneth Leung. All rights reserved.
 
-(ns leiningen.bixby
+(ns leiningen.bixby-libjars
 
   (:require [leiningen.jar :as jar]
             [leiningen.pom :as pom]
@@ -85,7 +85,7 @@
                    :dependencies
                    :managed-dependencies project)
                   (filter #(.endsWith (.getName ^File %) ".jar")))
-        lib (io/file toDir "lib")
+        lib (io/file toDir)
         jars (cons (io/file jar) deps)]
     (.mkdirs lib)
     (doseq [^File fj jars
@@ -166,7 +166,7 @@
       (spit (io/file d "readme.txt") "log files"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn bixby
+(defn- XXXbixby
 
   "Podify bixby to standalone application."
   [project & args]
@@ -178,6 +178,17 @@
     (clean-dir dir)
     (pack-lib project dir)
     (pack-files project dir)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn bixby-libjars
+
+  "Download all jars required by bixby."
+  [project & args]
+
+  (let [dir (io/file (:root project) "lib")]
+    (.mkdir (io/file dir))
+    (clean-dir dir)
+    (pack-lib project dir)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;EOF
