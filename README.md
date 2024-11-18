@@ -1,17 +1,17 @@
-# lein-bixby-libjars
-A lein plugin to download all the jars required by an czlab/bixby application.
+# lein-libjars
+A lein plugin to download all the jars required by this application.
 
-[![Build Status](https://travis-ci.org/llnek/lein-bixby-libjars.svg?branch=master)](https://travis-ci.org/llnek/lein-bixby-libjars)
+[![Build Status](https://travis-ci.org/llnek/lein-libjars.svg?branch=master)](https://travis-ci.org/llnek/lein-libjars)
 
 ## Installation
 
 Add the following dependency to your `project.clj` file:
 
-    [lein-bixby-libjars "2.2.0"]
+    [lein-libjars "2.2.0"]
 
 ## Documentation
 
-* [API Docs](https://llnek.github.io/lein-bixby-libjars/)
+* [API Docs](https://llnek.github.io/lein-libjars/)
 
 
 ## Usage
@@ -28,9 +28,9 @@ Distributed under the Apache License either version 2.0 or (at
 your option) any later version.
 
 <!--- links (repos) -->
-[CHANGELOG]: https://github.com/llnek/lein-bixby-libjars/releases
-[GitHub issues page]: https://github.com/llnek/lein-bixby-libjars/issues
-[GitHub contributors page]: https://github.com/llnek/lein-bixby-libjars/graphs/contributors
+[CHANGELOG]: https://github.com/llnek/lein-libjars/releases
+[GitHub issues page]: https://github.com/llnek/lein-libjars/issues
+[GitHub contributors page]: https://github.com/llnek/lein-libjars/graphs/contributors
 
 
 
