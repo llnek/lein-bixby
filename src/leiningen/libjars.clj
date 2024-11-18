@@ -12,7 +12,7 @@
 ;;
 ;; Copyright © 2013-2024, Kenneth Leung. All rights reserved.
 
-(ns leiningen.bixby-libjars
+(ns leiningen.libjars
 
   (:require [leiningen.jar :as jar]
             [leiningen.pom :as pom]
@@ -180,7 +180,7 @@
     (pack-files project dir)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn bixby-libjars
+(defn libjars
 
   "Download all jars required by bixby."
   [project & args]
